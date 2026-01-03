@@ -62,3 +62,6 @@ yarn-error.log*
 *.orig
 *.pyc
 __pycache__/
+
+*.zip
+Redis-x64-3.2.100
