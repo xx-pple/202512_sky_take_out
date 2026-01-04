@@ -25,8 +25,14 @@ public class JwtTokenUserInterceptor implements HandlerInterceptor {
     public boolean preHandle(HttpServletRequest request, HttpServletResponse
             response, Object handler) throws Exception {
 //判断当前拦截到的是Controller的⽅法还是其他资源
-        if (!(handler instanceof HandlerMethod)) {
+        if (!(handler instanceof HandlerMethod)) {                  //微信小程序走
 //当前拦截到的不是动态⽅法，直接放⾏
+            String token = request.getHeader(jwtProperties.getUserTokenName());
+            Claims claims = JwtUtil.parseJWT(jwtProperties.getUserSecretKey(),token);
+//校验不通过，抛异常，通过则继续执⾏
+            Long userId = Long.valueOf(claims.get(JwtClaimsConstant.USER_ID).toString());
+            log.info("当前⽤⼾的id：{}", userId);
+            BaseContext.setCurrentId(userId);
             return true;
         }
 //1、从请求头中获取令牌
@@ -37,9 +43,8 @@ public class JwtTokenUserInterceptor implements HandlerInterceptor {
             Claims claims = JwtUtil.parseJWT(jwtProperties.getUserSecretKey(),
                     token);
 //校验不通过，抛异常，通过则继续执⾏
-            Long userId =
-                    Long.valueOf(claims.get(JwtClaimsConstant.USER_ID).toString());
-            log.info("当前⽤⼾的id：", userId);
+            Long userId = Long.valueOf(claims.get(JwtClaimsConstant.USER_ID).toString());
+            log.info("当前⽤⼾的id：{}", userId);
             BaseContext.setCurrentId(userId);
 //3、通过，放⾏
             return true;

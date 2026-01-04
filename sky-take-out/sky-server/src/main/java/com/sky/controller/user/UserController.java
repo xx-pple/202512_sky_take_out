@@ -1,11 +1,13 @@
 package com.sky.controller.user;
 
 import com.sky.constant.JwtClaimsConstant;
+import com.sky.context.BaseContext;
 import com.sky.dto.UserLoginDTO;
 import com.sky.entity.User;
 import com.sky.mapper.UserMapper;
 import com.sky.properties.JwtProperties;
 import com.sky.result.Result;
+import com.sky.service.OrderService;
 import com.sky.service.UserService;
 import com.sky.utils.JwtUtil;
 import com.sky.vo.UserLoginVO;
@@ -32,6 +34,8 @@ public class UserController {
     private JwtProperties jwtProperties;
     @Autowired
     private UserMapper userMapper;
+    @Autowired
+    private OrderService orderService;
     /**
      * 微信登录
      * @param userLoginDTO
@@ -43,17 +47,15 @@ public class UserController {
         log.info("微信⽤⼾登录：{}",userLoginDTO.getCode());
 //微信登录
         User user = userService.wxLogin(userLoginDTO);//后绪步骤实现
-//为微信⽤⼾⽣成jwt令牌
+        //为微信⽤⼾⽣成jwt令牌
         Map<String, Object> claims = new HashMap<>();
         claims.put(JwtClaimsConstant.USER_ID, user.getId());
-        String token = JwtUtil.createJWT(jwtProperties.getUserSecretKey(),
-                jwtProperties.getUserTtl(), claims);
+        String token = JwtUtil.createJWT(jwtProperties.getUserSecretKey(),jwtProperties.getUserTtl(), claims);
         UserLoginVO userLoginVO = UserLoginVO.builder()
                 .id(user.getId())
                 .openid(user.getOpenid())
                 .token(token)
                 .build();
-
         return Result.success(userLoginVO);
     }
     /**
@@ -76,7 +78,7 @@ public class UserController {
     @GetMapping
     @Cacheable(cacheNames = "userCache",key="#id")
     public User getById(Long id){
-        User user = userMapper.getByid(id);
+        User user = userMapper.getById(id);
         return user;
     }
 
@@ -92,4 +94,6 @@ public class UserController {
     public void deleteAll(){
         userMapper.deleteAll();
     }
+
+
 }

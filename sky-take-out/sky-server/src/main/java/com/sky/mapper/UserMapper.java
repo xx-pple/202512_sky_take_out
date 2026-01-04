@@ -6,6 +6,8 @@ import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
 
+import java.util.Map;
+
 @Mapper
 public interface UserMapper {
     /**
@@ -20,7 +22,7 @@ public interface UserMapper {
      * @param
      */
     @Select("SELECT * FROM user where id = #{id}")
-    User getByid(Long id);
+    User getById(Long id);
 
 
     void insert(User user);
@@ -35,7 +37,13 @@ public interface UserMapper {
     /**
      *
      */
-    @Delete("DELETE * FROM user")
+    @Delete("DELETE FROM user")
     void deleteAll();
 
+    /**
+     * 根据动态条件统计⽤⼾数量
+     * @param map
+     * @return
+     */
+    Integer countByMap(Map map);
 }

@@ -3,6 +3,7 @@ package com.sky.service.impl;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.sky.constant.MessageConstant;
+import com.sky.context.BaseContext;
 import com.sky.dto.UserLoginDTO;
 import com.sky.entity.User;
 import com.sky.exception.LoginFailedException;
@@ -34,15 +35,15 @@ public class UserServiceImpl implements UserService {
      * @return
      */
     public User wxLogin(UserLoginDTO userLoginDTO) {
-// 根据code码获取openid⽅法，下⾯单独定义
+    // 根据code码获取openid⽅法，下⾯单独定义
         String openid = getOpenid(userLoginDTO.getCode());
-//判断openid是否为空，如果为空表⽰登录失败，抛出业务异常
+    //判断openid是否为空，如果为空表⽰登录失败，抛出业务异常
         if(openid == null){
             throw new LoginFailedException(MessageConstant.LOGIN_FAILED);
         }
-//判断当前⽤⼾是否为新⽤⼾
+    //判断当前⽤⼾是否为新⽤⼾
         User user = userMapper.getByOpenid(openid);
-//如果是新⽤⼾，⾃动完成注册
+        //如果是新⽤⼾，⾃动完成注册
         if(user == null){
             user = User.builder()
                     .openid(openid)
@@ -50,7 +51,8 @@ public class UserServiceImpl implements UserService {
                     .build();
             userMapper.insert(user);//后绪步骤实现
         }
-//返回这个⽤⼾对象
+
+        BaseContext.setCurrentId(user.getId());
         return user;
     }
     /**
